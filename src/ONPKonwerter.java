@@ -44,6 +44,7 @@ class ONPKonwerter {
                     }
                     stos.push(znak);
                 }
+
             }
         }
 
@@ -65,7 +66,7 @@ class ONPKonwerter {
 
     // motoda do sprawdznia czy dany opertor to jest ktorys z znakow
     private static boolean czyOperator(char znak) {
-        return znak == '+' || znak == '-' || znak == '*' || znak == '/' || znak == '^';
+        return znak == '+' || znak == '-' || znak == '*' || znak == '/' || znak == '^' || znak == '!' || znak == '%';
     }
 
     // nadanie priosrytetu w onp bardzo wazne zeby zachowac skladnie
