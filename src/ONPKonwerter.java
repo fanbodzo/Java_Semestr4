@@ -7,7 +7,8 @@ class ONPKonwerter {
         Stack<Character> stos = new Stack<>();
         StringBuilder liczba = new StringBuilder();
 
-        for (char znak : wyrazenie.toCharArray()) {
+        for (int i =0 ; i< wyrazenie.length(); i++) {
+            char znak = wyrazenie.charAt(i);
 
             if (Character.isDigit(znak)) {
 
@@ -43,6 +44,9 @@ class ONPKonwerter {
                         output.append(stos.pop()).append(' ');
                     }
                     stos.push(znak);
+                    //sprawwdzanie sqrt w osobnej metodzie
+                }else if (znak == 's') {
+                    i = czySqrt(wyrazenie, i, stos);
                 }
 
             }
@@ -74,8 +78,21 @@ class ONPKonwerter {
         return switch (operator) {
             case '+', '-' -> 1;
             case '*', '/' -> 2;
-            case '^' ->3;
+            case '^' -> 3;
+            case 'x' -> 4;
             default -> -1;
         };
+    }
+
+    private static int czySqrt(String wyrazenie, int indeks, Stack<Character> stos) {
+        String sqrt = "sqrt";
+        for (int j = 0; j < sqrt.length(); j++) {
+            if (indeks + j >= wyrazenie.length() || wyrazenie.charAt(indeks + j) != sqrt.charAt(j)) {
+                throw new IllegalArgumentException("niepoprwana instancja sqrt");
+            }
+        }
+        // wrzucam na stos x bo jest latwiej
+        stos.push('x');
+        return indeks + sqrt.length() - 1;
     }
 }
