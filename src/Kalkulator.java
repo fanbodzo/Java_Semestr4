@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.Scanner;
 
+
 public class Kalkulator {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -50,7 +51,7 @@ public class Kalkulator {
                     //jezeli wyrazenie onp nie jest puste to
                     if (!onp.isEmpty()) {
                         //wysylam do klasy obliczOnp do metody .kalk wyrazenie onp ktore otrzymalem z konwertera
-                        double wynik = ObliczONP.kalk(onp);  // Zakładam, że `kalk` zwraca wynik jako double
+                        double wynik = ObliczONP.kalk(onp);
                         System.out.println("Wyrażenie ONP: " + onp);
                         System.out.println("Wynik: " + wynik);
 

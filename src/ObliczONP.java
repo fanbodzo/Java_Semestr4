@@ -24,11 +24,11 @@ class ObliczONP {
 
                 }
 
-        } else if (token.equals("!") || token.equals("x")) {
+        } else if (token.equals("!") || token.equals("√")) {
                 double a = stos.pop();
                 switch (token) {
                     case "!" -> stos.push(integral(a));
-                    case "x" -> stos.push(Math.sqrt(a));
+                    case "√" -> stos.push(Math.sqrt(a));
                 }
 
 

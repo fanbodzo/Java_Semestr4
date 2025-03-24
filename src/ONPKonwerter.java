@@ -82,7 +82,7 @@ class ONPKonwerter {
         return switch (operator) {
             case '+', '-' -> 1;
             case '*', '/' -> 2;
-            case '^' -> 3;
+            case '^', '%' -> 3;
             case '√' -> 4;
             default -> -1;
         };
