@@ -91,7 +91,7 @@ class ONPKonwerter {
                 throw new IllegalArgumentException("niepoprwana instancja sqrt");
             }
         }
-        // wrzucam na stos x bo jest latwiej
+        //wrzucam na stos znaczek pierwiastka
         stos.push('√');
         return indeks + sqrt.length() - 1;
     }

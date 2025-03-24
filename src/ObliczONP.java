@@ -1,7 +1,7 @@
 import java.util.Stack;
 
 //klasa do obliczania onp
-class obliczONP {
+class ObliczONP {
     public static double kalk(String onp) {
         Stack<Double> stos = new Stack<>();
 
