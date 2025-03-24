@@ -6,7 +6,7 @@ class ObliczONP {
         Stack<Double> stos = new Stack<>();
 
         for (String token : onp.split(" ")) {
-            if (token.matches("[0-9]")) {
+            if (token.matches("\\d+(\\.\\d+)?")) {
 
                 stos.push(Double.parseDouble(token));
 
