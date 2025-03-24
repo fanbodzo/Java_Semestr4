@@ -45,8 +45,12 @@ class ONPKonwerter {
                     }
                     stos.push(znak);
                     //sprawwdzanie sqrt w osobnej metodzie
-                }else if (znak == 's') {
-                    i = czySqrt(wyrazenie, i, stos);
+                }try{
+                   if (znak == 's') {
+                        i = czySqrt(wyrazenie, i, stos);
+                    }
+                }catch(IllegalArgumentException e){
+                    throw new java.lang.IllegalArgumentException(e.getMessage());
                 }
 
             }

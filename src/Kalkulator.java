@@ -1,16 +1,6 @@
 import java.io.IOException;
 import java.util.Scanner;
 
-/*
-    ogolnie to ladnie smiga
-    moge dodac wczyytwanie z pliku wyrazen zeby bylo prosciej wpisywac wieksze ilosci wyrazen2
-
-    musze dodac wyjatek na:
-    na nieobslugiwany operator np & albo //
-    na zla postac rownania ze np nienkonczy sie na =
-    walidator wypierdoli blad ze jakis znak jest niepoprawny to moge zmienic w instancji klasy
- */
-
 public class Kalkulator {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
