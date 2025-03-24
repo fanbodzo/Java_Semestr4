@@ -79,7 +79,7 @@ class ONPKonwerter {
             case '+', '-' -> 1;
             case '*', '/' -> 2;
             case '^' -> 3;
-            case 'x' -> 4;
+            case '√' -> 4;
             default -> -1;
         };
     }
@@ -92,7 +92,7 @@ class ONPKonwerter {
             }
         }
         // wrzucam na stos x bo jest latwiej
-        stos.push('x');
+        stos.push('√');
         return indeks + sqrt.length() - 1;
     }
 }
