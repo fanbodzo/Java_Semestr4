@@ -27,7 +27,4 @@ public class FileReaderTask implements Callable<String> {
             lock.unlock();
         }
     }
-
-
-
 }

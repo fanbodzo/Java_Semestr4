@@ -1,9 +1,12 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
 /**
- * zadanie ktoro wykonuje walidacje , konwersje do onp i obliczanie wykorzystuajca juz
- * utworzone wczesniej klasy
+ * writer ktory wykonuje walidacje , konwersje do onp i obliczanie wykorzystuajca juz
+ * utworzone wczesniej klasy i zapisuje
  */
 public class KalkulatorTask implements Callable<String> {
     private final String wyrazenie;
@@ -27,9 +30,17 @@ public class KalkulatorTask implements Callable<String> {
                     double wynik = ObliczONP.kalk(onp);
                     System.out.println("Wyrażenie ONP: " + onp);
                     System.out.println("Wynik: " + wynik);
+
+                    //zapis do pliku narazie nowego pliku zebyu sprawdzic czy dziala
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter("rownania_wynik.txt", true))) {
+                        bw.write(wyrazenie + " = " + wynik);
+                        bw.newLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     return wyrazenie + "=" + wynik;
                 }
-
             }
             return wyrazenie + " = blad";
         } catch (java.lang.IllegalArgumentException e) {
