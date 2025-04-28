@@ -1,60 +1,54 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Lock;
 
 /**
- * writer ktory wykonuje walidacje , konwersje do onp i obliczanie wykorzystuajca juz
- * utworzone wczesniej klasy i zapisuje
+ * wlasna implementacja FutureTask ktora opakwuje zadanie do obliczenia ObliczanieRownania
+ * done() wywolywuje ise po zakonczeiu obliczen i aktualizuje wspoldzielona liste wynikow
  */
-public class KalkulatorTask implements Callable<String> {
-    private final String wyrazenie;
-    private final Lock lock;
+public class KalkulatorTask extends FutureTask<WynikObliczenia> {
 
-    public KalkulatorTask(String wyrazenie, Lock lock) {
-        this.wyrazenie = wyrazenie;
-        this.lock = lock;
+    private final Lock lock;
+    //lista wspoldzielona z wynikami
+    private final List<String> listaWynikow;
+    private final int indexLinii;
+
+    public KalkulatorTask(ObliczanieRownania callable, Lock blokadaListy, List<String> listaWynikow) {
+        // wylolanie konstruktora nadrzednego z zadaniem callable
+        super(callable);
+
+        this.lock = blokadaListy;
+        this.listaWynikow = listaWynikow;
+        this.indexLinii = callable.indexLinii;
     }
 
     @Override
-    public String call() throws Exception {
-        lock.lock();
-        try {
-            if (Walidator.sprawdzWyrazenie(wyrazenie)) {
-                List<String> rownania = Files.readAllLines(Paths.get("rownania.txt"));
-                List<String> noweRownania = new ArrayList<>();
-                String onp = ONPKonwerter.toOnp(wyrazenie);
+    protected void done() {
+        String nazwaWatku = Thread.currentThread().getName();
+        try{
+            WynikObliczenia wynik = get();
+            lock.lock();
+            try{
+                String oryginalnaLinia = listaWynikow.get(wynik.getIndex());
+                String prefixLinii = oryginalnaLinia.split("=")[0].trim() + " =";
 
-                if (!onp.isEmpty()) {
-                    //wysylam do klasy obliczOnp do metody .kalk wyrazenie onp ktore otrzymalem z konwertera
-                    double wynik = ObliczONP.kalk(onp);
-                    System.out.println("Wyrażenie ONP: " + onp);
-                    System.out.println("Wynik: " + wynik);
-
-                    for(String rownanie : rownania) {
-                        if(rownanie.equals(wyrazenie)) {
-                            noweRownania.add(rownanie + " = " + wynik);
-                        }else{
-                            noweRownania.add(rownanie);
-                        }
-                    }
-                    Files.write(Paths.get("rownania.txt"), noweRownania);
-
-                    return wyrazenie + "=" + wynik;
+                if(wynik.czySukces()){
+                    listaWynikow.set(wynik.getIndex(), prefixLinii + " " + wynik.getWartosc());
+                    System.out.println(nazwaWatku + " wynik zakonczyl sie sukcesem zakutalizowano liste dlalinii: " + (wynik.getIndex() + 1));
+                }else {
+                    listaWynikow.set(wynik.getIndex(), prefixLinii + " " + wynik.getKomunikatBledu());
+                    System.err.println(nazwaWatku + " wynik zakonczyl sie niepowodzeniem zakutalizowano liste dlalinii: " + (wynik.getIndex() + 1));
                 }
+            }finally{
+                lock.unlock();
             }
-            return wyrazenie + " = blad";
-        } catch (java.lang.IllegalArgumentException e) {
-            System.out.println("blad " + e.getMessage());
-            return wyrazenie + e.getMessage();
-        }finally{
-            lock.unlock();
+        }catch(InterruptedException | ExecutionException e){
+            e.printStackTrace();
+
         }
+
+
     }
 
 }
