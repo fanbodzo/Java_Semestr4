@@ -1,6 +1,10 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 
@@ -22,22 +26,24 @@ public class KalkulatorTask implements Callable<String> {
         lock.lock();
         try {
             if (Walidator.sprawdzWyrazenie(wyrazenie)) {
-                // wysylam wyrazenie  tablicy rownania do konwertera ktory dziala zle
+                List<String> rownania = Files.readAllLines(Paths.get("rownania.txt"));
+                List<String> noweRownania = new ArrayList<>();
                 String onp = ONPKonwerter.toOnp(wyrazenie);
-                //jezeli wyrazenie onp nie jest puste to
+
                 if (!onp.isEmpty()) {
                     //wysylam do klasy obliczOnp do metody .kalk wyrazenie onp ktore otrzymalem z konwertera
                     double wynik = ObliczONP.kalk(onp);
                     System.out.println("Wyrażenie ONP: " + onp);
                     System.out.println("Wynik: " + wynik);
 
-                    //zapis do pliku narazie nowego pliku zebyu sprawdzic czy dziala
-                    try (BufferedWriter bw = new BufferedWriter(new FileWriter("rownania_wynik.txt", true))) {
-                        bw.write(wyrazenie + " = " + wynik);
-                        bw.newLine();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    for(String rownanie : rownania) {
+                        if(rownanie.equals(wyrazenie)) {
+                            noweRownania.add(rownanie + " = " + wynik);
+                        }else{
+                            noweRownania.add(rownanie);
+                        }
                     }
+                    Files.write(Paths.get("rownania.txt"), noweRownania);
 
                     return wyrazenie + "=" + wynik;
                 }
