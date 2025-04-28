@@ -1,67 +1,97 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Kalkulator {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        Scanner sc = new Scanner(System.in);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Lock lock = new ReentrantLock();
 
-        int liczbaRownan;
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("rownania.txt"));
+        String linia;
+        while((linia = bufferedReader.readLine()) != null) {
+            Callable<String> fileReaderTask = new FileReaderTask(linia , lock);
 
-        do{
-            System.out.println("Podaj ilosc wyrazen ktore chcesz wpisac:");
-            try{
-                liczbaRownan = Integer.parseInt(sc.nextLine());
-                if(liczbaRownan < 1){
-                    throw new IllegalArgumentException("Liczba rownan musi byc wieksza od zera");
-                }
-            }catch(NumberFormatException e){
-                System.out.println("liczba rownan musi wyrazac sie w arabskiej liczbie calkowitej a nie slownie");
-                liczbaRownan = 0;
-            }catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-                liczbaRownan = 0;
-            }
-
-        }while(liczbaRownan < 1);
-
-        String[] rownania = new String[liczbaRownan];
-        System.out.println("Wprowadź wyrażenia zakończone znakiem '=' :");
-        for (int i = 0; i < liczbaRownan; i++) {
-            StringBuilder wyrazenieBuilder = new StringBuilder();
-            while (true) {
-                String linia = sc.nextLine().trim();
-                if (linia.endsWith("=")) {
-                    wyrazenieBuilder.append(linia.replace("=", ""));
-                    break;
-                } else {
-                    wyrazenieBuilder.append(linia).append(" ");
-                }
-            }
-            rownania[i] = wyrazenieBuilder.toString().trim();
-        }
-
-        for (String wyrazenie : rownania) {
-            // sprawdzam w walidatorze z listy dozwoloncyh znakow czy sie zgadza
-            try{
-                if (Walidator.sprawdzWyrazenie(wyrazenie)) {
-                    // wysylam wyrazenie  tablicy rownania do konwertera ktory dziala zle
-                    String onp = ONPKonwerter.toOnp(wyrazenie);
-                    //jezeli wyrazenie onp nie jest puste to
-                    if (!onp.isEmpty()) {
-                        //wysylam do klasy obliczOnp do metody .kalk wyrazenie onp ktore otrzymalem z konwertera
-                        double wynik = ObliczONP.kalk(onp);
-                        System.out.println("Wyrażenie ONP: " + onp);
-                        System.out.println("Wynik: " + wynik);
-
+            FutureTask<String> futureTask = new FutureTask<>(fileReaderTask){
+                @Override
+                protected void done() {
+                    try{
+                        String wyrazenie = get();
+                        executor.submit(new KalkulatorTask(wyrazenie , lock));
+                    }catch(Exception e){
+                        e.printStackTrace();
                     }
 
                 }
-            }catch(java.lang.IllegalArgumentException e){
-                System.out.println("blad " + e.getMessage());
-            }
-
+            };
+            executor.submit(futureTask);
         }
+
+//        Scanner sc = new Scanner(System.in);
+//
+//        int liczbaRownan;
+//
+//        do{
+//            System.out.println("Podaj ilosc wyrazen ktore chcesz wpisac:");
+//            try{
+//                liczbaRownan = Integer.parseInt(sc.nextLine());
+//                if(liczbaRownan < 1){
+//                    throw new IllegalArgumentException("Liczba rownan musi byc wieksza od zera");
+//                }
+//            }catch(NumberFormatException e){
+//                System.out.println("liczba rownan musi wyrazac sie w arabskiej liczbie calkowitej a nie slownie");
+//                liczbaRownan = 0;
+//            }catch (IllegalArgumentException e) {
+//                System.out.println(e.getMessage());
+//                liczbaRownan = 0;
+//            }
+//
+//        }while(liczbaRownan < 1);
+//
+//        String[] rownania = new String[liczbaRownan];
+//        System.out.println("Wprowadź wyrażenia zakończone znakiem '=' :");
+//        for (int i = 0; i < liczbaRownan; i++) {
+//            StringBuilder wyrazenieBuilder = new StringBuilder();
+//            while (true) {
+//                String linia = sc.nextLine().trim();
+//                if (linia.endsWith("=")) {
+//                    wyrazenieBuilder.append(linia.replace("=", ""));
+//                    break;
+//                } else {
+//                    wyrazenieBuilder.append(linia).append(" ");
+//                }
+//            }
+//            rownania[i] = wyrazenieBuilder.toString().trim();
+//        }
+//
+//        for (String wyrazenie : rownania) {
+//            // sprawdzam w walidatorze z listy dozwoloncyh znakow czy sie zgadza
+//            try{
+//                if (Walidator.sprawdzWyrazenie(wyrazenie)) {
+//                    // wysylam wyrazenie  tablicy rownania do konwertera ktory dziala zle
+//                    String onp = ONPKonwerter.toOnp(wyrazenie);
+//                    //jezeli wyrazenie onp nie jest puste to
+//                    if (!onp.isEmpty()) {
+//                        //wysylam do klasy obliczOnp do metody .kalk wyrazenie onp ktore otrzymalem z konwertera
+//                        double wynik = ObliczONP.kalk(onp);
+//                        System.out.println("Wyrażenie ONP: " + onp);
+//                        System.out.println("Wynik: " + wynik);
+//
+//                    }
+//
+//                }
+//            }catch(java.lang.IllegalArgumentException e){
+//                System.out.println("blad " + e.getMessage());
+//            }
+//
+//        }
     }
 }
